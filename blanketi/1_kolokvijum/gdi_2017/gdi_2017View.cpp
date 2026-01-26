@@ -45,6 +45,9 @@ Cgdi2017View::Cgdi2017View() noexcept
 	predjeniPut = 0.0f;
 	skaliranje = 1.0f;
 
+	prednjeNapred = true;
+	zadnjeNapred = false;
+
 	noga1 = new DImage;
 	noga2 = new DImage;
 	noga3 = new DImage;
@@ -272,23 +275,69 @@ Cgdi2017Doc* Cgdi2017View::GetDocument() const // non-debug version is inline
 
 void Cgdi2017View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	// jebem ti ja ovu matematiku
-
-	// ciklus:
-	// -20, -19, ..., -1, 0, 1, ..., 19, 20, 19, ..., 1, 0, -1, ..., -19, -20
-
-	const int maxUgao = 20;
-	const int duzinaCiklusa = 2 * (2 * maxUgao) + 1; // 81 (raste 40 koraka pa opada 40 koraka)
-
 	if (nChar == VK_RIGHT)
 	{
-		indeksKruga = (indeksKruga + 1) % duzinaCiklusa;
 		predjeniPut += 3.0f;
+
+		if (prednjeNapred)
+		{
+			ugaoRotacijePrednjeNoge += 1.0f;
+			if (ugaoRotacijePrednjeNoge >= 20.0f)
+				prednjeNapred = false;
+		}
+		else
+		{
+			ugaoRotacijePrednjeNoge -= 1.0f;
+			if (ugaoRotacijePrednjeNoge <= -20.0f)
+				prednjeNapred = true;
+		}
+
+		if (zadnjeNapred)
+		{
+			ugaoRotacijeZadnjeNoge += 1.0f;
+			if (ugaoRotacijeZadnjeNoge >= 20.0f)
+				zadnjeNapred = false;
+		}
+		else
+		{
+			ugaoRotacijeZadnjeNoge -= 1.0f;
+			if (ugaoRotacijeZadnjeNoge <= -20.0f)
+				zadnjeNapred = true;
+		}
+
+		Invalidate();
 	}
 	else if (nChar == VK_LEFT)
 	{
-		indeksKruga = (indeksKruga - 1 + duzinaCiklusa) % duzinaCiklusa;
 		predjeniPut -= 3.0f;
+
+		if (prednjeNapred)
+		{
+			ugaoRotacijePrednjeNoge -= 1.0f;
+			if (ugaoRotacijePrednjeNoge <= -20.0f)
+				prednjeNapred = false;
+		}
+		else
+		{
+			ugaoRotacijePrednjeNoge += 1.0f;
+			if (ugaoRotacijePrednjeNoge >= 20.0f)
+				prednjeNapred = true;
+		}
+
+		if (zadnjeNapred)
+		{
+			ugaoRotacijeZadnjeNoge -= 1.0f;
+			if (ugaoRotacijeZadnjeNoge <= -20.0f)
+				zadnjeNapred = false;
+		}
+		else
+		{
+			ugaoRotacijeZadnjeNoge += 1.0f;
+			if (ugaoRotacijeZadnjeNoge >= 20.0f)
+				zadnjeNapred = true;
+		}
+
+		Invalidate();
 	}
 	else if (nChar == VK_UP)
 	{
@@ -306,35 +355,6 @@ void Cgdi2017View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		CView::OnKeyDown(nChar, nRepCnt, nFlags);
 		return;
 	}
-	else
-	{
-		CView::OnKeyDown(nChar, nRepCnt, nFlags);
-		return;
-	}
-
-	// mapiranje indeksa 0..80 u ugao -20..20..-20
-	// prvo mapiramo u t = 0..40..0 (trougao), pa od toga oduzmemo 20
-	int t = indeksKruga;
-	if (t > 2 * maxUgao)
-		t = 4 * maxUgao - t; // 80 - t
-
-	const int ugaoZadnje = t - maxUgao;
-
-	// prednje noge: isti ciklus, ali fazno pomeren za 20 "stepeni" (20 koraka)
-	const int fazniPomeraj = 20;
-	int indeksPrednje = (indeksKruga + fazniPomeraj) % duzinaCiklusa;
-
-	int tPrednje = indeksPrednje;
-
-	if (tPrednje > 2 * maxUgao)
-		tPrednje = 4 * maxUgao - tPrednje;
-
-	const int ugaoPrednje = tPrednje - maxUgao;
-
-	ugaoRotacijeZadnjeNoge = (float)ugaoZadnje;
-	ugaoRotacijePrednjeNoge = (float)ugaoPrednje;
-
-	Invalidate();
 
 	CView::OnKeyDown(nChar, nRepCnt, nFlags);
 }

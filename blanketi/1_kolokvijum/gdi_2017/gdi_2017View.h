@@ -57,6 +57,8 @@ protected:
 	float ugaoRotacijePrednjeNoge;
 	float predjeniPut;
 	float skaliranje;	
+	bool prednjeNapred;
+	bool zadnjeNapred;
 
 	void LoadIdentity(CDC* pDC);
 	void Translate(CDC* pDC, float dX, float dY, bool rightMultiply);
@@ -67,8 +69,6 @@ protected:
 	void DrawLeg(CDC* pDC, double alpha, double dx, double dy);
 public:
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	
-	// potrebno takodje za antiflicker kako stvarno ne bi treperelo
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };
 
@@ -76,5 +76,4 @@ public:
 inline Cgdi2017Doc* Cgdi2017View::GetDocument() const
    { return reinterpret_cast<Cgdi2017Doc*>(m_pDocument); }
 #endif
-
 
